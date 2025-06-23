@@ -88,3 +88,61 @@ OK
 ```
 
 ### 4. Pousser votre code sur un nouveau repository Github et avec Github Actions créer un workflow permettant de lancer les tests unitaires de votre application.
+
+github-actions-demo.yml :
+
+```
+name: CI Python
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Installer Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Lancer les tests
+      run: python3 -m unittest discover
+```
+
+On push. Toutes les étapes du workflow sont vertes, tout est passé !
+
+[new workflow](./images/new_workflow.png)
+
+### 5. Créer la fonction soustraction et le test associé. Puis, pousser votre commit. Les tests sont effectués automatiquement via la pipeline.
+
+simple_maths.py :
+
+```
+class SimpleMath:
+    @staticmethod
+    def addition(a, b):
+        return a + b
+
+    @staticmethod
+    def soustraction(a, b):
+        return a - b
+```
+
+test_simple_maths.py : (on ajoute)
+
+```
+def test_soustraction(self):
+    self.assertEqual(SimpleMath.soustraction(5, 3), 2)
+```
+On peut tester localement:
+```
+python3 -m unittest test_simple_math.py
+```
+Puis on push et on vérifie que l'action est bien passé
