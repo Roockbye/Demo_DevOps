@@ -18,5 +18,12 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Lancer les tests
+    - name: Installer les dépendances
+      run: pip install -r requirements.txt
+
+    - name: Lancer Pylint (analyse statique)
+      run: |
+        pylint simple_math.py test_simple_math.py || true
+
+    - name: Lancer les tests unitaires
       run: python3 -m unittest discover

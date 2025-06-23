@@ -47,7 +47,28 @@ Hi Roockbye! You've successfully authenticated, but GitHub does not provide shel
 
 ### 2. Tester un premier workflow Github avec l’exemple suivant : https://docs.github.com/fr/actions/quickstart
 
-voir fichier github-actions-demo.yml
+voir fichier github-actions-demo.yml:
+
+```
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+```
 
 ```
 rocky@pacman:~/Demo_DevOps$ mkdir -p .github/workflows
@@ -71,6 +92,8 @@ la branche 'main' est paramétrée pour suivre 'origin/main'.
 ```
 
 [test github actions](./images/github_actions.png)
+
+On push et on vérifie dans "Actions" si le workflow est bien remonté.
 
 ### 3. Créer deux classes python, une classe SimpleMath contenant une fonction statique “addition” prenant deux arguments. Et une classe TestSimpleMath qui hérite de unittest.TestCase et contient une fonction de test unitaire.
 
@@ -146,3 +169,76 @@ On peut tester localement:
 python3 -m unittest test_simple_math.py
 ```
 Puis on push et on vérifie que l'action est bien passé
+
+### 6. Ajouter une étape de lint (validation statique et syntaxique de votre code source) dans votre workflow. Utiliser pylint.
+
+```
+pip install pylint
+```
+
+```
+echo "pylint" > requirements.txt
+```
+Ça permettra d'installer les dépendances nécessaires au projet si quelqu'un d'autres souhaite le reprendre.
+
+Tester pylint localement :
+
+```
+pylint simple_maths.py test_simple_maths.py
+```
+
+```
+(.venv) rocky@pacman:~/Demo_DevOps$ pylint simple_maths.py test_simple_maths.py
+************* Module simple_maths
+simple_maths.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+simple_maths.py:1:0: C0115: Missing class docstring (missing-class-docstring)
+simple_maths.py:3:4: C0116: Missing function or method docstring (missing-function-docstring)
+simple_maths.py:7:4: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module test_simple_maths
+test_simple_maths.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+test_simple_maths.py:4:0: C0115: Missing class docstring (missing-class-docstring)
+test_simple_maths.py:5:4: C0116: Missing function or method docstring (missing-function-docstring)
+test_simple_maths.py:7:4: C0116: Missing function or method docstring (missing-function-docstring)
+
+-----------------------------------
+Your code has been rated at 4.29/10
+```
+Le test fonctionne bien, nous finissons avec une mauvaise note, ce qui est normal dans ce contexte.
+
+On va modifier le workflow :
+
+```
+name: CI Python
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Installer Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Installer les dépendances
+      run: pip install -r requirements.txt
+
+    - name: Lancer Pylint (analyse statique)
+      run: |
+        pylint simple_math.py test_simple_math.py || true
+
+    - name: Lancer les tests unitaires
+      run: python3 -m unittest discover
+```
+Le || true à la fin de la commande pylint permet de ne pas casser le pipeline même si pylint met une mauvaise note.
+
+### 7. Ajouter une étape qui build un conteneur Docker embarquant votre application. La directive CMD de votre Dockerfile doit exécuter les tests unitaires dès le run d’un nouveau conteneur à partir de cette image.
+
