@@ -27,3 +27,6 @@ jobs:
 
     - name: Lancer les tests unitaires
       run: python3 -m unittest discover
+
+    - name: Build Docker image
+      run: docker build -t demo-devops .

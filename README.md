@@ -6,17 +6,17 @@
 https://docs.github.com/fr/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
 
 https://docs.github.com/fr/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
-```
+```bash
 ssh-keygen -t ed25519 -C "your_email@example.com"
 ```
-```
+```bash
 $ eval "$(ssh-agent -s)"
 > Agent pid 59566
 ```
-```
+```bash
 ssh-add ~/.ssh/id_ed25519
 ```
-```
+```bash
 cat ~/.ssh/id_ed25519.pub
 # Then select and copy the contents of the id_ed25519.pub file
 # displayed in the terminal to your clipboard
@@ -49,7 +49,7 @@ Hi Roockbye! You've successfully authenticated, but GitHub does not provide shel
 
 voir fichier github-actions-demo.yml:
 
-```
+```yml
 name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
@@ -70,7 +70,7 @@ jobs:
       - run: echo "🍏 This job's status is ${{ job.status }}."
 ```
 
-```
+```bash
 rocky@pacman:~/Demo_DevOps$ mkdir -p .github/workflows
 rocky@pacman:~/Demo_DevOps$ nano .github/workflows/github-actions-demo.yml
 rocky@pacman:~/Demo_DevOps$ git add .
@@ -101,7 +101,7 @@ On push et on vérifie dans "Actions" si le workflow est bien remonté.
 Voir fichier simple_maths.py et test_simple_maths.py
 
 On test que tout fonctionne bien : 
-```
+```bash
 rocky@pacman:~/Demo_DevOps$ python3 -m unittest test_simple_maths.py
 .
 ----------------------------------------------------------------------
@@ -114,7 +114,7 @@ OK
 
 github-actions-demo.yml :
 
-```
+```yaml
 name: CI Python
 
 on:
@@ -147,7 +147,7 @@ On push. Toutes les étapes du workflow sont vertes, tout est passé !
 
 simple_maths.py :
 
-```
+```python
 class SimpleMath:
     @staticmethod
     def addition(a, b):
@@ -160,34 +160,34 @@ class SimpleMath:
 
 test_simple_maths.py : (on ajoute)
 
-```
+```python
 def test_soustraction(self):
     self.assertEqual(SimpleMath.soustraction(5, 3), 2)
 ```
 On peut tester localement:
-```
+```bash
 python3 -m unittest test_simple_math.py
 ```
 Puis on push et on vérifie que l'action est bien passé
 
 ### 6. Ajouter une étape de lint (validation statique et syntaxique de votre code source) dans votre workflow. Utiliser pylint.
 
-```
+```bash
 pip install pylint
 ```
 
-```
+```bash
 echo "pylint" > requirements.txt
 ```
 Ça permettra d'installer les dépendances nécessaires au projet si quelqu'un d'autres souhaite le reprendre.
 
 Tester pylint localement :
 
-```
+```bash
 pylint simple_maths.py test_simple_maths.py
 ```
 
-```
+```bash
 (.venv) rocky@pacman:~/Demo_DevOps$ pylint simple_maths.py test_simple_maths.py
 ************* Module simple_maths
 simple_maths.py:1:0: C0114: Missing module docstring (missing-module-docstring)
@@ -207,7 +207,7 @@ Le test fonctionne bien, nous finissons avec une mauvaise note, ce qui est norma
 
 On va modifier le workflow :
 
-```
+```yaml
 name: CI Python
 
 on:
@@ -240,5 +240,60 @@ jobs:
 ```
 Le || true à la fin de la commande pylint permet de ne pas casser le pipeline même si pylint met une mauvaise note.
 
+[ajout lint](./images/ajout_lint.png)
+
 ### 7. Ajouter une étape qui build un conteneur Docker embarquant votre application. La directive CMD de votre Dockerfile doit exécuter les tests unitaires dès le run d’un nouveau conteneur à partir de cette image.
+
+Je teste localement mon Docker file avant de le push
+```bash
+docker build -t demo-devops .
+```
+```bash
+(.venv) rocky@pacman:~/Demo_DevOps$ docker build -t demo-devops .
+[+] Building 6.5s (9/9) FINISHED                                                                                                                                                 docker:default
+ => [internal] load build definition from Dockerfile                                                                                                                                       0.0s
+ => => transferring dockerfile: 180B                                                                                                                                                       0.0s
+ => [internal] load metadata for docker.io/library/python:3.11-slim                                                                                                                        1.3s
+ => [internal] load .dockerignore                                                                                                                                                          0.0s
+ => => transferring context: 2B                                                                                                                                                            0.0s
+ => [1/4] FROM docker.io/library/python:3.11-slim@sha256:9e1912aab0a30bbd9488eb79063f68f42a68ab0946cbe98fecf197fe5b085506                                                                  1.9s
+ => => resolve docker.io/library/python:3.11-slim@sha256:9e1912aab0a30bbd9488eb79063f68f42a68ab0946cbe98fecf197fe5b085506                                                                  0.0s
+ => => sha256:9e1912aab0a30bbd9488eb79063f68f42a68ab0946cbe98fecf197fe5b085506 9.13kB / 9.13kB                                                                                             0.0s
+ => => sha256:cfa2a40862158178855ab4f7cf6b9341646f826b0467a7b72bdeac68b03986bb 1.75kB / 1.75kB                                                                                             0.0s
+ => => sha256:be3324b8ee1a17161c5fa4a20f310d4af42cbb4f22a1e7a32a98ee9196a6defd 5.37kB / 5.37kB                                                                                             0.0s
+ => => sha256:dad67da3f26bce15939543965e09c4059533b025f707aad72ed3d3f3a09c66f8 28.23MB / 28.23MB                                                                                           1.1s
+ => => sha256:799440a7bae7c08a5fe9d9e5a1ccd72fc3cbf9d85fa4be450e12b8550175c620 3.51MB / 3.51MB                                                                                             0.8s
+ => => sha256:9596beeb5a6dc0950529870568799000e8d73fb678969ac2f485005cd5da1087 16.21MB / 16.21MB                                                                                           1.4s
+ => => sha256:15658014cd85cd0d8b913d50b4388228aebcf0437d43cfb37e8a5177e8b2bcf8 248B / 248B                                                                                                 1.0s
+ => => extracting sha256:dad67da3f26bce15939543965e09c4059533b025f707aad72ed3d3f3a09c66f8                                                                                                  0.4s
+ => => extracting sha256:799440a7bae7c08a5fe9d9e5a1ccd72fc3cbf9d85fa4be450e12b8550175c620                                                                                                  0.1s
+ => => extracting sha256:9596beeb5a6dc0950529870568799000e8d73fb678969ac2f485005cd5da1087                                                                                                  0.2s
+ => => extracting sha256:15658014cd85cd0d8b913d50b4388228aebcf0437d43cfb37e8a5177e8b2bcf8                                                                                                  0.0s
+ => [internal] load build context                                                                                                                                                          0.3s
+ => => transferring context: 42.79MB                                                                                                                                                       0.3s
+ => [2/4] WORKDIR /app                                                                                                                                                                     0.2s
+ => [3/4] COPY . .                                                                                                                                                                         0.3s
+ => [4/4] RUN pip install --no-cache-dir -r requirements.txt                                                                                                                               2.5s
+ => exporting to image                                                                                                                                                                     0.4s
+ => => exporting layers                                                                                                                                                                    0.4s
+ => => writing image sha256:e1daa7249ef4cf1e1d605b336f8df390f5a69464b1b576d21f45ce5ebed57423                                                                                               0.0s
+ => => naming to docker.io/library/demo-devops 
+```
+
+```bash
+(.venv) rocky@pacman:~/Demo_DevOps$ docker run --rm demo-devops
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+```
+Tout fonctionne ! Je peux maintenant ajouter mon dockerfile dans mon workflow
+
+on rajoute sur **.github/workflows/github-actions-demo.yml** :
+
+```yaml
+    - name: Build Docker image
+      run: docker build -t demo-devops .
+```
 
