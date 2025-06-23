@@ -194,7 +194,7 @@ def test_soustraction(self):
 ```
 On peut tester localement:
 ```bash
-python3 -m unittest test_simple_math.py
+python3 -m unittest test_simple_maths.py
 ```
 Puis on push et on vérifie que l'action est bien passé. Tout est vert.
 
@@ -261,7 +261,7 @@ jobs:
 
     - name: Lancer Pylint (analyse statique)
       run: |
-        pylint simple_math.py test_simple_math.py || true
+        pylint simple_maths.py test_simple_maths.py || true
 
     - name: Lancer les tests unitaires
       run: python3 -m unittest discover

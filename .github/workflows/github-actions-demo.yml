@@ -23,7 +23,7 @@ jobs:
 
     - name: Lancer Pylint (analyse statique)
       run: |
-        pylint simple_math.py test_simple_math.py || true
+        pylint simple_maths.py test_simple_maths.py || true
 
     - name: Lancer les tests unitaires
       run: python3 -m unittest discover
