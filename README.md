@@ -77,6 +77,7 @@ la branche 'main' est paramétrée pour suivre 'origin/main'.
 
 Voir fichier simple_maths.py et test_simple_maths.py
 
+On test que tout fonctionne bien : 
 ```
 rocky@pacman:~/Demo_DevOps$ python3 -m unittest test_simple_maths.py
 .
@@ -85,3 +86,5 @@ Ran 1 test in 0.000s
 
 OK
 ```
+
+### 4. Pousser votre code sur un nouveau repository Github et avec Github Actions créer un workflow permettant de lancer les tests unitaires de votre application.
