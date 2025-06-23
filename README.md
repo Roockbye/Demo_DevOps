@@ -6,6 +6,7 @@
 https://docs.github.com/fr/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
 
 https://docs.github.com/fr/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
 ```bash
 ssh-keygen -t ed25519 -C "your_email@example.com"
 ```
@@ -30,7 +31,7 @@ cat ~/.ssh/id_ed25519.pub
 
 - Dans le champ « Titre », ajoutez une étiquette descriptive pour la nouvelle clé. Par exemple, si vous utilisez un ordinateur portable personnel, vous pouvez nommer cette clé « Ordinateur portable personnel »
 
-- Sélectionnez le type de clé : authentification ou signature. Pour plus d’informations sur la signature de commit, consultez À propos de la vérification des signatures de commit.
+- Sélectionnez le type de clé : authentification ou signature.
 
 - Dans le champ « Clé », collez votre clé publique.
 
@@ -42,12 +43,15 @@ cat ~/.ssh/id_ed25519.pub
 rocky@pacman:~/Documents/DevOps/TP_CI$ ssh -T git@github.com
 Hi Roockbye! You've successfully authenticated, but GitHub does not provide shell access.
 ```
+Cette dernière fonctionne correctement
 
-[ssh](./images/ssh.png)
+[SSH](./images/ssh.png)
 
 ### 2. Tester un premier workflow Github avec l’exemple suivant : https://docs.github.com/fr/actions/quickstart
 
-voir fichier github-actions-demo.yml:
+créer le dossier : **.github/workflows** puis le fichier **github-actions-demo.yml**
+
+voir fichier github-actions-demo.yml: (rajoutez ces lignes)
 
 ```yml
 name: GitHub Actions Demo
@@ -69,6 +73,7 @@ jobs:
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
 ```
+Puis on push :
 
 ```bash
 rocky@pacman:~/Demo_DevOps$ mkdir -p .github/workflows
@@ -93,12 +98,34 @@ la branche 'main' est paramétrée pour suivre 'origin/main'.
 
 [test github actions](./images/github_actions.png)
 
-On push et on vérifie dans "Actions" si le workflow est bien remonté.
+On push et on vérifie dans le repository --> "Actions" si le workflow est bien remonté.
 
 ### 3. Créer deux classes python, une classe SimpleMath contenant une fonction statique “addition” prenant deux arguments. Et une classe TestSimpleMath qui hérite de unittest.TestCase et contient une fonction de test unitaire.
 
 
-Voir fichier simple_maths.py et test_simple_maths.py
+fichier simple_maths.py :
+
+```python
+class SimpleMath:
+    @staticmethod
+    def addition(a, b):
+        return a + b
+```
+
+
+test_simple_maths.py
+
+```python
+import unittest
+from simple_maths import SimpleMath
+
+class TestSimpleMath(unittest.TestCase):
+    def test_addition(self):
+        self.assertEqual(SimpleMath.addition(2, 3), 5)
+
+if __name__ == '__main__':
+    unittest.main()
+```
 
 On test que tout fonctionne bien : 
 ```bash
@@ -109,6 +136,7 @@ Ran 1 test in 0.000s
 
 OK
 ```
+Tout est ok !
 
 ### 4. Pousser votre code sur un nouveau repository Github et avec Github Actions créer un workflow permettant de lancer les tests unitaires de votre application.
 
@@ -168,7 +196,7 @@ On peut tester localement:
 ```bash
 python3 -m unittest test_simple_math.py
 ```
-Puis on push et on vérifie que l'action est bien passé
+Puis on push et on vérifie que l'action est bien passé. Tout est vert.
 
 ### 6. Ajouter une étape de lint (validation statique et syntaxique de votre code source) dans votre workflow. Utiliser pylint.
 
@@ -297,3 +325,6 @@ on rajoute sur **.github/workflows/github-actions-demo.yml** :
       run: docker build -t demo-devops .
 ```
 
+[ajout docker file](./images/ajout_dockerfile.png)
+
+Tout fonctionne !
